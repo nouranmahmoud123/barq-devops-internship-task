@@ -1,0 +1,152 @@
+
+========================================================================
+Q1  UTC interval, valid / malformed / duplicate lines
+========================================================================
+access.log: total=726 valid=725 malformed=1 duplicate_extra=5 (byte-identical=5)  2026-08-20T11:00:00.015Z -> 2026-08-20T11:29:57.578Z
+    malformed line 311: '{"timestamp":"2026-08-20T11:12:48Z","request_id":'
+application.log: total=730 valid=729 malformed=1 duplicate_extra=2 (byte-identical=2)  2026-08-20T11:00:00.015Z -> 2026-08-20T11:29:57.578Z
+    malformed line 401: '{"timestamp":"2026-08-20T11:17:00Z","event":'
+error.log: total=68 request_errors=67 other_lines=1 duplicate_request_ids=0  2026/08/20 11:05:02 -> 2026/08/20 11:26:47
+    non-request line 68: '2026/08/20 11:30:00 [notice] 31#31: log collector rotated stream'
+application.log: 47 request_ids carry 2 different events (http_request + dependency_error) - NOT duplicates
+
+========================================================================
+Q2  distinct client requests
+========================================================================
+distinct client requests (access.log deduplicated by request_id) = 720
+excluded: 1 malformed line(s), 5 duplicate record(s)
+requests listing several upstream attempts (counted once): 19
+
+========================================================================
+Q3  final client status counts and error rate
+========================================================================
+  200:  615  85.42%
+  404:   10   1.39%
+  502:   40   5.56%
+  503:   47   6.53%
+  504:    8   1.11%
+denominator = 720 distinct client requests
+5xx rate = 95/720 = 13.19%
+4xx = 10 (of which 10 are the /missing probe)
+4xx+5xx rate = 105/720 = 14.58%
+
+========================================================================
+Q4  failures by path, minute and backend
+========================================================================
+5xx by (path, status):
+   /          502  10
+   /counter   502  10
+   /counter   503  16
+   /health    502  10
+   /ready     503  23
+   /records   502  10
+   /records   503  8
+   /records   504  8
+5xx per minute (UTC)      502  503  504
+   2026-08-20T11:05      8    0    0
+   2026-08-20T11:06      8    0    0
+   2026-08-20T11:07      8    0    0
+   2026-08-20T11:08      8    0    0
+   2026-08-20T11:09      8    0    0
+   2026-08-20T11:12      0    8    0
+   2026-08-20T11:13      0    7    0
+   2026-08-20T11:14      0    8    0
+   2026-08-20T11:15      0    8    0
+   2026-08-20T11:20      0    8    0
+   2026-08-20T11:21      0    8    0
+   2026-08-20T11:25      0    0    4
+   2026-08-20T11:26      0    0    4
+upstream IP -> app instance (proved by request_id join):
+   172.23.0.11:8080   -> app-01: 379
+   172.23.0.12:8080   -> app-02: 301
+5xx by final upstream:
+   172.23.0.11:8080   503: 23
+   172.23.0.11:8080   504: 4
+   172.23.0.12:8080   502: 40
+   172.23.0.12:8080   503: 24
+   172.23.0.12:8080   504: 4
+error.log lines by (kind, upstream):
+   refused  172.23.0.12:8080: 59
+   timeout  172.23.0.11:8080: 4
+   timeout  172.23.0.12:8080: 4
+
+========================================================================
+Q5  client latency (access.log request_time: seconds, shown in ms)
+========================================================================
+all distinct requests: n=720 median=54.0 ms  p95(nearest-rank)=2001.0 ms  p95(linear)=2001.0 ms  max=2025.0 ms
+status 200 only: n=615 median=55.0 ms  p95(nearest-rank)=93.0 ms  p95(linear)=93.0 ms  max=120.0 ms
+status >= 500 only: n=95 median=41.0 ms  p95(nearest-rank)=2025.0 ms  p95(linear)=2025.0 ms  max=2025.0 ms
+
+========================================================================
+Q6  upstream retries
+========================================================================
+requests with more than one upstream attempt: 19; final 200 after retry: 19
+   upstream=172.23.0.12:8080, 172.23.0.11:8080 upstream_status=502, 200 final_status=200: 19
+of these, present in error.log: 19
+
+========================================================================
+Q7  incident timeline per minute (access 5xx + error.log + application dependency_error)
+========================================================================
+minute_utc        access_502  access_503  access_504  app_dep_postgres  app_dep_redis  error_refused  error_timeout
+2026-08-20T11:05           8           0           0                 0              0             12              0
+2026-08-20T11:06           8           0           0                 0              0             12              0
+2026-08-20T11:07           8           0           0                 0              0             12              0
+2026-08-20T11:08           8           0           0                 0              0             12              0
+2026-08-20T11:09           8           0           0                 0              0             11              0
+2026-08-20T11:12           0           8           0                 0              8              0              0
+2026-08-20T11:13           0           7           0                 0              7              0              0
+2026-08-20T11:14           0           8           0                 0              8              0              0
+2026-08-20T11:15           0           8           0                 0              8              0              0
+2026-08-20T11:20           0           8           0                 8              0              0              0
+2026-08-20T11:21           0           8           0                 8              0              0              0
+2026-08-20T11:25           0           0           4                 0              0              0              4
+2026-08-20T11:26           0           0           4                 0              0              0              4
+first -> last minute per signal:
+   access_502: 2026-08-20T11:05 -> 2026-08-20T11:09
+   access_503: 2026-08-20T11:12 -> 2026-08-20T11:21
+   access_504: 2026-08-20T11:25 -> 2026-08-20T11:26
+   app_dep_postgres: 2026-08-20T11:20 -> 2026-08-20T11:21
+   app_dep_redis: 2026-08-20T11:12 -> 2026-08-20T11:15
+   error_refused: 2026-08-20T11:05 -> 2026-08-20T11:09
+   error_timeout: 2026-08-20T11:25 -> 2026-08-20T11:26
+
+========================================================================
+Q8  correlated examples (same request_id across the three logs)
+========================================================================
+
+--- FAILED 502  request_id=lab-000122
+  access     : {"timestamp": "2026-08-20T11:05:02.503Z", "request_id": "lab-000122", "method": "GET", "path": "/health", "status": 502, "upstream": "172.23.0.12:8080", "upstream_status": "502", "request_time": 0.003, "client": "192.0.2.24"}
+  error.log  : 2026/08/20 11:05:02 [error] 31#31: *122 connect() failed (111: Connection refused) while connecting to upstream, request_id=lab-000122, request: "GET /health HTTP/1.1", upstream: "http://172.23.0.12:8080/health"
+  application: (no record)
+
+--- FAILED 503  request_id=lab-000292
+  access     : {"timestamp": "2026-08-20T11:12:09.525Z", "request_id": "lab-000292", "method": "GET", "path": "/ready", "status": 503, "upstream": "172.23.0.12:8080", "upstream_status": "503", "request_time": 2.025, "client": "192.0.2.24"}
+  error.log  : (no line)
+  application: {"timestamp": "2026-08-20T11:12:09.524Z", "level": "ERROR", "event": "dependency_error", "request_id": "lab-000292", "instance_id": "app-02", "dependency": "redis", "error_type": "TimeoutError"}
+  application: {"timestamp": "2026-08-20T11:12:09.525Z", "level": "WARN", "event": "http_request", "request_id": "lab-000292", "instance_id": "app-02", "method": "GET", "path": "/ready", "status": 503, "duration_ms": 2025.0}
+
+--- FAILED 504  request_id=lab-000606
+  access     : {"timestamp": "2026-08-20T11:25:14.501Z", "request_id": "lab-000606", "method": "GET", "path": "/records", "status": 504, "upstream": "172.23.0.12:8080", "upstream_status": "504", "request_time": 2.001, "client": "192.0.2.24"}
+  error.log  : 2026/08/20 11:25:14 [error] 31#31: *606 upstream timed out (110: Operation timed out) while reading response header from upstream, request_id=lab-000606, request: "GET /records HTTP/1.1", upstream: "http://172.23.0.12:8080/records"
+  application: {"timestamp": "2026-08-20T11:25:15.200Z", "level": "INFO", "event": "http_request", "request_id": "lab-000606", "instance_id": "app-02", "method": "GET", "path": "/records", "status": 200, "duration_ms": 2700}
+
+--- RETRY THEN 200  request_id=lab-000124
+  access     : {"timestamp": "2026-08-20T11:05:07.620Z", "request_id": "lab-000124", "method": "GET", "path": "/ready", "status": 200, "upstream": "172.23.0.12:8080, 172.23.0.11:8080", "upstream_status": "502, 200", "request_time": 0.12, "client": "192.0.2.24"}
+  error.log  : 2026/08/20 11:05:07 [error] 31#31: *124 connect() failed (111: Connection refused) while connecting to upstream, request_id=lab-000124, request: "GET /ready HTTP/1.1", upstream: "http://172.23.0.12:8080/ready"
+  application: {"timestamp": "2026-08-20T11:05:07.620Z", "level": "INFO", "event": "http_request", "request_id": "lab-000124", "instance_id": "app-01", "method": "GET", "path": "/ready", "status": 200, "duration_ms": 120.0}
+
+--- PLAIN 200  request_id=lab-000002
+  access     : {"timestamp": "2026-08-20T11:00:02.532Z", "request_id": "lab-000002", "method": "GET", "path": "/health", "status": 200, "upstream": "172.23.0.12:8080", "upstream_status": "200", "request_time": 0.032, "client": "192.0.2.24"}
+  error.log  : (no line)
+  application: {"timestamp": "2026-08-20T11:00:02.532Z", "level": "INFO", "event": "http_request", "request_id": "lab-000002", "instance_id": "app-02", "method": "GET", "path": "/health", "status": 200, "duration_ms": 32.0}
+
+========================================================================
+Q9  proxy/connectivity vs dependency/application
+========================================================================
+HTTP 502: n=40  in error.log=40 {'refused': 40}  in application.log=0
+HTTP 504: n=8  in error.log=8 {'timeout': 8}  in application.log=8
+HTTP 503: n=47  in error.log=0 {}  in application.log=47
+app duration_ms of the 504 requests: [2700, 2700, 2700, 2700, 2700, 2700, 2700, 2700]
+dependency_error events by (dependency, error_type): {('redis', 'TimeoutError'): 31, ('postgres', 'InvalidPassword'): 16}
+503 whose upstream_status is also 503 (the app itself answered): 47
+reconciliation: refused lines=59  vs  final-502-with-refused(40) + retried-then-200(19) = 59  -> match=True
