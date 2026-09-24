@@ -1,0 +1,101 @@
+
+===== access.log =====
+total lines=726  valid=725  malformed=1
+   malformed line 311: Expecting value: line 1 column 50 (char  | '{"timestamp":"2026-08-20T11:12:48Z","request_id":'
+distinct key sets:
+      725  ('client', 'method', 'path', 'request_id', 'request_time', 'status', 'timestamp', 'upstream', 'upstream_status')
+records without request_id: 0
+distinct request_id: 720
+request_ids appearing more than once: 5 (extra records: 5)
+byte-identical duplicate lines (extra copies): 5
+timestamps not in expected format: 0 []
+first / last valid timestamp: 2026-08-20T11:00:00.015Z  ->  2026-08-20T11:29:57.578Z
+status:
+      620  200
+       47  503
+       40  502
+       10  404
+        8  504
+method:
+      725  'GET'
+path:
+      123  '/'
+      119  '/records'
+      119  '/instance'
+      118  '/health'
+      118  '/ready'
+      118  '/counter'
+       10  '/missing'
+upstream values containing a comma (retry attempts): 19
+upstream:
+      365  '172.23.0.11:8080'
+      341  '172.23.0.12:8080'
+       19  '172.23.0.12:8080, 172.23.0.11:8080'
+upstream_status:
+      601  '200'
+       47  '503'
+       40  '502'
+       19  '502, 200'
+       10  '404'
+        8  '504'
+request_time (seconds): numeric=725 non-numeric=0 min=0.003 max=2.025
+
+===== application.log =====
+total lines=730  valid=729  malformed=1
+   malformed line 401: Expecting value: line 1 column 45 (char  | '{"timestamp":"2026-08-20T11:17:00Z","event":'
+distinct key sets:
+      682  ('duration_ms', 'event', 'instance_id', 'level', 'method', 'path', 'request_id', 'status', 'timestamp')
+       47  ('dependency', 'error_type', 'event', 'instance_id', 'level', 'request_id', 'timestamp')
+records without request_id: 0
+distinct request_id: 680
+request_ids appearing more than once: 49 (extra records: 49)
+byte-identical duplicate lines (extra copies): 2
+timestamps not in expected format: 0 []
+first / last valid timestamp: 2026-08-20T11:00:00.015Z  ->  2026-08-20T11:29:57.578Z
+level:
+      625  'INFO'
+       57  'WARN'
+       47  'ERROR'
+event:
+      682  'http_request'
+       47  'dependency_error'
+instance_id:
+      404  'app-01'
+      325  'app-02'
+status:
+      625  200
+       47  None
+       47  503
+       10  404
+path:
+      119  '/instance'
+      118  '/ready'
+      110  '/'
+      109  '/records'
+      108  '/health'
+      108  '/counter'
+       47  None
+       10  '/missing'
+duration_ms (milliseconds): numeric=682 non-numeric=47 min=15.0 max=2700
+
+===== error.log =====
+total lines=68  matched pattern=67  unmatched=1
+   unmatched line 68: '2026/08/20 11:30:00 [notice] 31#31: log collector rotated stream'
+level:
+       67  'error'
+message type:
+       59  'connect() failed (111: Connection refused) while connecting to upstream'
+        8  'upstream timed out (110: Operation timed out) while reading response header from upstream'
+first / last timestamp: 2026/08/20 11:05:02  ->  2026/08/20 11:26:47
+lines without request_id: 0
+distinct request_id: 67
+request_ids appearing more than once: 0 (extra records: 0)
+upstream address:
+       63  '172.23.0.12:8080'
+        4  '172.23.0.11:8080'
+
+===== request_id overlap between files =====
+access=720  application=680  error=67
+in access AND application: 680
+in access only: 40   in application only: 0
+error ids also in access: 67   also in application: 27
