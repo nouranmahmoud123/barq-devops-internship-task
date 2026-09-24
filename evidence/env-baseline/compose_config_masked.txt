@@ -1,0 +1,173 @@
+name: barq-assessment
+services:
+  app-01:
+    build:
+      context: /home/nouran/projects/barq-devops-internship-task
+      dockerfile: Dockerfile
+    container_name: app-01
+    environment:
+      APP_HOST: 127.0.0.1
+      APP_MESSAGE: Welcome to BARQ Systems
+      APP_PORT: "8080"
+      DATABASE_URL: postgresql://barq_app:<hidden>@postgres:5433/barq_tasks
+      INSTANCE_ID: app-01
+      REDIS_URL: redis://redis:6380/0
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/healthz', timeout=2)
+      timeout: 3s
+      interval: 5s
+      retries: 3
+      start_period: 3s
+    init: true
+    networks:
+      backend: null
+      frontend: null
+    restart: "no"
+  app-02:
+    build:
+      context: /home/nouran/projects/barq-devops-internship-task
+      dockerfile: Dockerfile
+    container_name: app-02
+    environment:
+      APP_HOST: 127.0.0.1
+      APP_MESSAGE: Welcome to BARQ Systems
+      APP_PORT: "8080"
+      DATABASE_URL: postgresql://barq_app:<hidden>@postgres:5433/barq_tasks
+      INSTANCE_ID: app-01
+      REDIS_URL: redis://redis:6380/0
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/healthz', timeout=2)
+      timeout: 3s
+      interval: 5s
+      retries: 3
+      start_period: 3s
+    init: true
+    networks:
+      backend: null
+      frontend: null
+    restart: "no"
+  nginx:
+    container_name: nginx
+    depends_on:
+      app-01:
+        condition: service_started
+        required: true
+      app-02:
+        condition: service_started
+        required: true
+    image: nginx:1.28-alpine@sha256:a8b39bd9cf0f83869a2162827a0caf6137ddf759d50a171451b335cecc87d236
+    networks:
+      backend: null
+      frontend: null
+    ports:
+      - mode: ingress
+        host_ip: 127.0.0.1
+        target: 81
+        published: "8080"
+        protocol: tcp
+    volumes:
+      - type: bind
+        source: /home/nouran/projects/barq-devops-internship-task/nginx/nginx.conf
+        target: /etc/nginx/nginx.conf
+        read_only: true
+        bind:
+          create_host_path: true
+  postgres:
+    container_name: postgres
+    environment:
+      POSTGRES_DB: barq_tasks
+      POSTGRES_PASSWORD: <hidden>
+      POSTGRES_USER: barq_app
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - pg_isready -U barq_app -d barq_tasks
+      timeout: 3s
+      interval: 3s
+      retries: 10
+    image: postgres:16-alpine@sha256:cf78e76683b9ca8c5733cbbdce6c9262b45b6767934dd0a95e671f9a0fc20685
+    networks:
+      backend: null
+    ports:
+      - mode: ingress
+        host_ip: 127.0.0.1
+        target: 5432
+        published: "15432"
+        protocol: tcp
+    tmpfs:
+      - /var/lib/postgresql/data
+    volumes:
+      - type: volume
+        source: postgres-data
+        target: /var/lib/postgresql/backup
+        volume: {}
+      - type: bind
+        source: /home/nouran/projects/barq-devops-internship-task/database/init.sql
+        target: /docker-entrypoint-initdb.d/01-init.sql
+        read_only: true
+        bind:
+          create_host_path: true
+  redis:
+    command:
+      - redis-server
+      - --save
+      - ""
+      - --appendonly
+      - "no"
+    container_name: redis
+    healthcheck:
+      test:
+        - CMD
+        - redis-cli
+        - ping
+      timeout: 2s
+      interval: 3s
+      retries: 5
+    image: redis:7.4-alpine@sha256:ff02b58f971e7d7d156a1267e283fcbbeee91773b6aa36c49dac28ecfe28eadf
+    networks:
+      backend: null
+    ports:
+      - mode: ingress
+        host_ip: 127.0.0.1
+        target: 6379
+        published: "16379"
+        protocol: tcp
+networks:
+  backend:
+    name: barq-assessment_backend
+    internal: true
+  frontend:
+    name: barq-assessment_frontend
+volumes:
+  postgres-data:
+    name: barq-assessment_postgres-data
+x-app:
+  build: .
+  env_file: ./config/app.env
+  environment:
+    APP_HOST: 127.0.0.1
+    APP_MESSAGE: Welcome to BARQ Systems
+    APP_PORT: "8080"
+  healthcheck:
+    interval: 5s
+    retries: 3
+    start_period: 3s
+    test:
+      - CMD
+      - python
+      - -c
+      - import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/healthz', timeout=2)
+    timeout: 3s
+  init: true
+  networks:
+    - frontend
+    - backend
+  restart: "no"

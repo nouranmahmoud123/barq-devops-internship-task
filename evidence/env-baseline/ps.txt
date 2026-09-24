@@ -1,0 +1,6 @@
+NAME       IMAGE                                                                                        COMMAND                  SERVICE    CREATED          STATUS                      PORTS
+app-01     barq-assessment-app-01                                                                       "python -m app.server"   app-01     23 seconds ago   Up 22 seconds (unhealthy)   8080/tcp
+app-02     barq-assessment-app-02                                                                       "python -m app.server"   app-02     23 seconds ago   Up 22 seconds (unhealthy)   8080/tcp
+nginx      nginx:1.28-alpine@sha256:a8b39bd9cf0f83869a2162827a0caf6137ddf759d50a171451b335cecc87d236    "/docker-entrypoint.…"   nginx      23 seconds ago   Up 20 seconds               80/tcp, 127.0.0.1:8080->81/tcp
+postgres   postgres:16-alpine@sha256:cf78e76683b9ca8c5733cbbdce6c9262b45b6767934dd0a95e671f9a0fc20685   "docker-entrypoint.s…"   postgres   23 seconds ago   Up 22 seconds (healthy)     5432/tcp
+redis      redis:7.4-alpine@sha256:ff02b58f971e7d7d156a1267e283fcbbeee91773b6aa36c49dac28ecfe28eadf     "docker-entrypoint.s…"   redis      23 seconds ago   Up 22 seconds (healthy)     6379/tcp

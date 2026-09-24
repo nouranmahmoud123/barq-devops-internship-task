@@ -1,0 +1,84 @@
+postgres  | 
+postgres  | 
+postgres  | Success. You can now start the database server using:
+postgres  | 
+postgres  |     pg_ctl -D /var/lib/postgresql/data -l logfile start
+postgres  | 
+postgres  | initdb: warning: enabling "trust" authentication for local connections
+postgres  | initdb: hint: You can change this by editing pg_hba.conf or using the option -A, or --auth-local and --auth-host, the next time you run initdb.
+postgres  | waiting for server to start....2026-09-24 02:18:04.066 UTC [41] LOG:  starting PostgreSQL 16.15 on x86_64-pc-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit
+postgres  | 2026-09-24 02:18:04.067 UTC [41] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+postgres  | 2026-09-24 02:18:04.068 UTC [44] LOG:  database system was shut down at 2026-09-24 02:18:03 UTC
+postgres  | 2026-09-24 02:18:04.071 UTC [41] LOG:  database system is ready to accept connections
+postgres  |  done
+postgres  | server started
+postgres  | CREATE DATABASE
+postgres  | 
+postgres  | 
+postgres  | /usr/local/bin/docker-entrypoint.sh: running /docker-entrypoint-initdb.d/01-init.sql
+postgres  | CREATE TABLE
+postgres  | INSERT 0 2
+app-02    | {"timestamp": "2026-09-24T02:18:03.585+00:00", "level": "INFO", "service": "barq-api", "event": "configuration_loaded", "database_url": "postgresql://barq_app:<hidden>@postgres:5433/barq_tasks", "redis_url": "redis://redis:6380/0"}
+postgres  | 
+postgres  | 
+app-02    |  * Serving Flask app 'server'
+postgres  | waiting for server to shut down....2026-09-24 02:18:04.213 UTC [41] LOG:  received fast shutdown request
+app-02    |  * Debug mode: off
+postgres  | 2026-09-24 02:18:04.213 UTC [41] LOG:  aborting any active transactions
+app-02    | [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+app-02    |  * Running on http://127.0.0.1:8080
+app-02    | [33mPress CTRL+C to quit[0m
+app-02    | {"timestamp": "2026-09-24T02:18:07.686+00:00", "level": "WARN", "service": "barq-api", "event": "http_request", "instance_id": "app-01", "request_id": "1b47efc8211e4c9eb929550dcdf6121d", "method": "GET", "path": "/healthz", "status": 404, "duration_ms": 0.105}
+app-02    | 127.0.0.1 - - [24/Sep/2026 02:18:07] "[33mGET /healthz HTTP/1.1[0m" 404 -
+postgres  | 2026-09-24 02:18:04.215 UTC [41] LOG:  background worker "logical replication launcher" (PID 47) exited with exit code 1
+app-02    | {"timestamp": "2026-09-24T02:18:12.997+00:00", "level": "WARN", "service": "barq-api", "event": "http_request", "instance_id": "app-01", "request_id": "932b836ffac3466191af01065c300480", "method": "GET", "path": "/healthz", "status": 404, "duration_ms": 0.097}
+app-02    | 127.0.0.1 - - [24/Sep/2026 02:18:12] "[33mGET /healthz HTTP/1.1[0m" 404 -
+app-02    | {"timestamp": "2026-09-24T02:18:18.322+00:00", "level": "WARN", "service": "barq-api", "event": "http_request", "instance_id": "app-01", "request_id": "38ec4208e8a241a4adbd0985d249cc6c", "method": "GET", "path": "/healthz", "status": 404, "duration_ms": 0.07}
+app-02    | 127.0.0.1 - - [24/Sep/2026 02:18:18] "[33mGET /healthz HTTP/1.1[0m" 404 -
+postgres  | 2026-09-24 02:18:04.216 UTC [42] LOG:  shutting down
+postgres  | 2026-09-24 02:18:04.216 UTC [42] LOG:  checkpoint starting: shutdown immediate
+postgres  | 2026-09-24 02:18:04.220 UTC [42] LOG:  checkpoint complete: wrote 932 buffers (5.7%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.004 s, sync=0.001 s, total=0.004 s; sync files=304, longest=0.001 s, average=0.000 s; distance=4297 kB, estimate=4297 kB; lsn=0/1929590, redo lsn=0/1929590
+postgres  | 2026-09-24 02:18:04.222 UTC [41] LOG:  database system is shut down
+postgres  |  done
+postgres  | server stopped
+postgres  | 
+postgres  | PostgreSQL init process complete; ready for start up.
+postgres  | 
+postgres  | 2026-09-24 02:18:04.339 UTC [1] LOG:  starting PostgreSQL 16.15 on x86_64-pc-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit
+postgres  | 2026-09-24 02:18:04.340 UTC [1] LOG:  listening on IPv4 address "0.0.0.0", port 5432
+postgres  | 2026-09-24 02:18:04.340 UTC [1] LOG:  listening on IPv6 address "::", port 5432
+postgres  | 2026-09-24 02:18:04.342 UTC [1] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+postgres  | 2026-09-24 02:18:04.343 UTC [59] LOG:  database system was shut down at 2026-09-24 02:18:04 UTC
+postgres  | 2026-09-24 02:18:04.346 UTC [1] LOG:  database system is ready to accept connections
+app-01    | {"timestamp": "2026-09-24T02:18:03.247+00:00", "level": "INFO", "service": "barq-api", "event": "configuration_loaded", "database_url": "postgresql://barq_app:<hidden>@postgres:5433/barq_tasks", "redis_url": "redis://redis:6380/0"}
+app-01    |  * Serving Flask app 'server'
+app-01    |  * Debug mode: off
+app-01    | [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+app-01    |  * Running on http://127.0.0.1:8080
+app-01    | [33mPress CTRL+C to quit[0m
+app-01    | 127.0.0.1 - - [24/Sep/2026 02:18:07] "[33mGET /healthz HTTP/1.1[0m" 404 -
+app-01    | {"timestamp": "2026-09-24T02:18:07.334+00:00", "level": "WARN", "service": "barq-api", "event": "http_request", "instance_id": "app-01", "request_id": "36f49aa207764c30acef8a0a65929a65", "method": "GET", "path": "/healthz", "status": 404, "duration_ms": 0.12}
+app-01    | {"timestamp": "2026-09-24T02:18:12.666+00:00", "level": "WARN", "service": "barq-api", "event": "http_request", "instance_id": "app-01", "request_id": "fd8ebc22a04241ba82a155c2e0319f23", "method": "GET", "path": "/healthz", "status": 404, "duration_ms": 0.099}
+app-01    | 127.0.0.1 - - [24/Sep/2026 02:18:12] "[33mGET /healthz HTTP/1.1[0m" 404 -
+app-01    | {"timestamp": "2026-09-24T02:18:17.905+00:00", "level": "WARN", "service": "barq-api", "event": "http_request", "instance_id": "app-01", "request_id": "8e9de41f5e4e4a70a7a9e38f3391247e", "method": "GET", "path": "/healthz", "status": 404, "duration_ms": 0.072}
+app-01    | 127.0.0.1 - - [24/Sep/2026 02:18:17] "[33mGET /healthz HTTP/1.1[0m" 404 -
+redis     | 1:C 24 Sep 2026 02:18:02.134 # WARNING Memory overcommit must be enabled! Without it, a background save or replication may fail under low memory condition. Being disabled, it can also cause failures without low memory condition, see https://github.com/jemalloc/jemalloc/issues/1328. To fix this issue add 'vm.overcommit_memory = 1' to /etc/sysctl.conf and then reboot or run the command 'sysctl vm.overcommit_memory=1' for this to take effect.
+redis     | 1:C 24 Sep 2026 02:18:02.135 * oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+redis     | 1:C 24 Sep 2026 02:18:02.135 * Redis version=7.4.11, bits=64, commit=00000000, modified=0, pid=1, just started
+redis     | 1:C 24 Sep 2026 02:18:02.135 * Configuration loaded
+redis     | 1:M 24 Sep 2026 02:18:02.135 * Increased maximum number of open files to 10032 (it was originally set to 1024).
+redis     | 1:M 24 Sep 2026 02:18:02.135 * monotonic clock: POSIX clock_gettime
+redis     | 1:M 24 Sep 2026 02:18:02.135 * Running mode=standalone, port=6379.
+redis     | 1:M 24 Sep 2026 02:18:02.136 * Server initialized
+redis     | 1:M 24 Sep 2026 02:18:02.136 * Ready to accept connections tcp
+nginx     | /docker-entrypoint.sh: /docker-entrypoint.d/ is not empty, will attempt to perform configuration
+nginx     | /docker-entrypoint.sh: Looking for shell scripts in /docker-entrypoint.d/
+nginx     | /docker-entrypoint.sh: Launching /docker-entrypoint.d/10-listen-on-ipv6-by-default.sh
+nginx     | 10-listen-on-ipv6-by-default.sh: info: Getting the checksum of /etc/nginx/conf.d/default.conf
+nginx     | 10-listen-on-ipv6-by-default.sh: info: Enabled listen on IPv6 in /etc/nginx/conf.d/default.conf
+nginx     | /docker-entrypoint.sh: Sourcing /docker-entrypoint.d/15-local-resolvers.envsh
+nginx     | /docker-entrypoint.sh: Launching /docker-entrypoint.d/20-envsubst-on-templates.sh
+nginx     | /docker-entrypoint.sh: Launching /docker-entrypoint.d/30-tune-worker-processes.sh
+nginx     | /docker-entrypoint.sh: Configuration complete; ready for start up
+app-01    | 127.0.0.1 - - [24/Sep/2026 02:18:23] "[33mGET /healthz HTTP/1.1[0m" 404 -
+app-01    | {"timestamp": "2026-09-24T02:18:23.267+00:00", "level": "WARN", "service": "barq-api", "event": "http_request", "instance_id": "app-01", "request_id": "d10615a63f6446dda7ba50b441473f6a", "method": "GET", "path": "/healthz", "status": 404, "duration_ms": 0.116}

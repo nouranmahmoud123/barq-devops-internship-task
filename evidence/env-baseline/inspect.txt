@@ -1,0 +1,5 @@
+/app-01 health=unhealthy restarts=0 user=root
+/app-02 health=unhealthy restarts=0 user=root
+/nginx health=none restarts=0 user=
+/postgres health=healthy restarts=0 user=
+/redis health=healthy restarts=0 user=
